@@ -19,22 +19,25 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
+
 public class MainActivity extends AppCompatActivity {
 
-    //Declarations of layout components
-    Button buttonChooseImage, buttonSave, buttonOpenFilters,buttonCancel;
-    ImageView imageView;
-    String currentPhotoPath;
-    //request code for taking picture
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    public static final int MEDIA_TYPE_IMAGE = 1;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
 
-    Uri selectedImage;
-    private Uri imageUri;
+    //Declarations of layout components
+    private Button buttonChooseImage, buttonSave, buttonOpenFilters,buttonCancel;
+    private  ImageView imageView;
+    private String currentPhotoPath;
+    //request code for taking picture
+
+
+    private Uri fileUri;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,39 +56,15 @@ public class MainActivity extends AppCompatActivity {
     private void takePicture()
     {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if(intent.resolveActivity(getPackageManager()) != null)
-        {
-            File photoFile = null;
-            try
-            {
-                photoFile = createImageFile();
-
-
-            } catch (IOException ex)
-            {
-
-            }
-            if(photoFile != null)
-            {
-                Uri URIx = FileProvider.getUriForFile(this,"mtrzepacz.androidgraphicfilters",photoFile);
-                Uri photoURI = Uri.fromFile(photoFile);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-            }
-        }
-
+        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
     }
     //get picture which was taken and shows it in Imageview
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
        if(requestCode ==  REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
        {
-           /* gets thumbnail only
-          Bundle extras = data.getExtras();
-          Bitmap image = (Bitmap) extras.get("data");
-          imageView.setImageBitmap(image);
-           */
-
            //getting full size image
            File imgFile = new File(currentPhotoPath);
            Bitmap rotatedBitmap = null;
@@ -118,20 +97,11 @@ public class MainActivity extends AppCompatActivity {
                }
                imageView.setImageBitmap(rotatedBitmap);
                addPicToGallery();
+            //   notifyMediaStoreScanner(imgFile);
            }
        }
     }
     //creating image file with unique name
-    private File createImageFile() throws IOException
-    {
-        String timeStamp = new SimpleDateFormat("yyyy-MM-DD-HH-MM-SS").format(new Date());
-        String imageFileName = " JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-
-            File image = File.createTempFile(imageFileName, ".jpg", storageDir);
-            currentPhotoPath = image.getAbsolutePath();
-            return image;
-    }
 
     // rotating image for displaying it correctly
     public static Bitmap rotateImage(Bitmap source, float angle) {
@@ -141,14 +111,44 @@ public class MainActivity extends AppCompatActivity {
                 matrix, true);
     }
 
-    private void addPicToGallery()
+    //getting file
+    private File getOutputMediaFile( int type)
     {
-        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File file = new File(currentPhotoPath);
-        Uri uri =  Uri.fromFile(file);
-        intent.setData(uri);
-        this.sendBroadcast(intent);
+        //location in external storage
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES),"APP FILES");
+        if(!mediaStorageDir.exists())
+        {
+            if(!mediaStorageDir.mkdirs())
+            {
+                Toast.makeText(this, "filed to create directory for files", Toast.LENGTH_SHORT).show();
+                return  null;
+            }
+        }
+        String timeStamp = new SimpleDateFormat("yyyy-MM-DD-HH-MM-SS").format(new Date());
+        File mediaFile;
+        if( type == MEDIA_TYPE_IMAGE)
+        {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator + timeStamp + ".jpg");
+            currentPhotoPath = mediaFile.getAbsolutePath();
+        }
+        else
+        {
+            return  null;
+        }
+        return mediaFile;
+    }
 
+    public Uri getOutputMediaFileUri(int type) {
+        return Uri.fromFile(getOutputMediaFile(type));
+    }
+    //adding picture to gallery
+    private void addPicToGallery() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(currentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
     }
 
 }
