@@ -26,16 +26,17 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
+    //statics
     public static final int MEDIA_TYPE_IMAGE = 1;
+    //request image code
     private static final int REQUEST_IMAGE_CAPTURE = 1;
-
     //Declarations of layout components
     private Button buttonChooseImage, buttonSave, buttonOpenFilters,buttonCancel;
     private  ImageView imageView;
     private String currentPhotoPath;
-    //request code for taking picture
 
 
+    public FilteredImage filteredImage;
     private Uri fileUri;
 
     @Override
@@ -51,6 +52,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         imageView = (ImageView) findViewById(R.id.imageView);
+        buttonOpenFilters = (Button) findViewById(R.id.buttonApplyFilter);
+        buttonOpenFilters.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                applyFilter(filteredImage);
+            }
+        });
     }
     //calling android camera app to take picture
     private void takePicture()
@@ -97,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                }
                imageView.setImageBitmap(rotatedBitmap);
                addPicToGallery();
+               filteredImage = new FilteredImage(rotatedBitmap);
             //   notifyMediaStoreScanner(imgFile);
            }
        }
@@ -149,6 +158,13 @@ public class MainActivity extends AppCompatActivity {
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
+    }
+
+    public void applyFilter(FilteredImage filteredImage)
+    {
+        filteredImage.toBlackWhite();
+        Bitmap bitmap = filteredImage.getFinalImage();
+        imageView.setImageBitmap(bitmap);
     }
 
 }
