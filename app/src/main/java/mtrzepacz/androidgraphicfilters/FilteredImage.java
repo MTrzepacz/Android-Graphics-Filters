@@ -17,7 +17,7 @@ public class FilteredImage {
     private int height;
 
     //constructor
-    public  FilteredImage(Bitmap bitmap)
+    public FilteredImage(Bitmap bitmap)
     {
         this.startImage = bitmap;
         this.finalImage = bitmap;
@@ -68,10 +68,10 @@ public class FilteredImage {
 
     public void toBlackWhite()
     {
+        this.finalImage = Bitmap.createBitmap(this.getWidth(), this.getHeight(), this.startImage.getConfig());
        for(int i = 0 ; i < this.height ; i++){
            for(int j = 0 ; j < this.width ; j++ ){
                int pixel = startImage.getPixel(j,i);
-               int alfa = Color.alpha(pixel);
                int red = Color.red(pixel);
                int green = Color.green(pixel);
                int blue = Color.blue(pixel);
