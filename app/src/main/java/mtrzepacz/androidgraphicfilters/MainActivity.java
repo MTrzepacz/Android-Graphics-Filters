@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -67,8 +68,6 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Pick Image First", Toast.LENGTH_SHORT).show();
                 else
                     openFilterList();
-
-
             }
         });
     }
@@ -147,6 +146,13 @@ public class MainActivity extends AppCompatActivity {
            {
                Toast.makeText(this, "negative", Toast.LENGTH_SHORT).show();
                filteredImage.toNegative();
+               Bitmap bitmap = filteredImage.getFinalImage();
+               imageView.setImageBitmap(bitmap);
+           }
+           if(pickedFilter.equals("GaussianBlur"))
+           {
+               Toast.makeText(this, "gaussian blur", Toast.LENGTH_SHORT).show();
+               filteredImage.toGaussianBlur();
                Bitmap bitmap = filteredImage.getFinalImage();
                imageView.setImageBitmap(bitmap);
            }
@@ -246,4 +252,5 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this,listOfFilters.class);
         startActivityForResult(intent,REQUEST_FILTER_PICK);
     }
+
 }

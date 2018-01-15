@@ -21,7 +21,7 @@ public class listOfFilters extends AppCompatActivity {
         setContentView(R.layout.activity_list_of_filters);
         listView = (ListView) findViewById(R.id.ListOfFilters);
 
-        String[] filters = {"BlackWhite","Negative","Gaussian Blur"};
+        String[] filters = {"BlackWhite","Negative","GaussianBlur"};
         ArrayList filtersList = new ArrayList<String>();
         for( int i = 0 ; i < filters.length ; i++)
             filtersList.add(i,filters[i]);
