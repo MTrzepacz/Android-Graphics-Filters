@@ -69,15 +69,34 @@ public class FilteredImage {
     public void toBlackWhite()
     {
         this.finalImage = Bitmap.createBitmap(this.getWidth(), this.getHeight(), this.startImage.getConfig());
-       for(int i = 0 ; i < this.height ; i++){
-           for(int j = 0 ; j < this.width ; j++ ){
+          for(int i = 0 ; i < this.height ; i++){
+            for(int j = 0 ; j < this.width ; j++ ){
                int pixel = startImage.getPixel(j,i);
                int red = Color.red(pixel);
                int green = Color.green(pixel);
                int blue = Color.blue(pixel);
                int average = (red + green + blue)/3;
                this.finalImage.setPixel(j,i,Color.rgb(average,average,average));
-           }
-       }
+            }
+        }
+        this.startImage = this.finalImage;
+    }
+
+    public void toNegative()
+    {
+        this.finalImage = Bitmap.createBitmap(this.getWidth(), this.getHeight(), this.startImage.getConfig());
+        for(int i = 0 ; i < this.height ; i++){
+            for(int j = 0 ; j < this.width ; j++ ) {
+                int pixel = startImage.getPixel(j, i);
+                int red = Color.red(pixel);
+                int green = Color.green(pixel);
+                int blue = Color.blue(pixel);
+                int newRed = 255 - red;
+                int newGreen = 255 - green;
+                int newBlue = 255 - blue;
+                this.finalImage.setPixel(j,i,Color.rgb(newRed,newGreen,newBlue));
+            }
+        }
+        this.startImage = this.finalImage;
     }
 }

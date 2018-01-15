@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     //request pick photo code
     private static final int REQUEST_IMAGE_PICK = 2;
+    //reqiest pick filter
+    private static final int REQUEST_FILTER_PICK = 3;
+
     //Declarations of layout components
     private Button buttonChooseImage, buttonSave, buttonOpenFilters,buttonCancel;
     private  ImageView imageView;
@@ -60,7 +63,12 @@ public class MainActivity extends AppCompatActivity {
         buttonOpenFilters.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                applyFilter(filteredImage);
+                if(filteredImage == null)
+                    Toast.makeText(MainActivity.this, "Pick Image First", Toast.LENGTH_SHORT).show();
+                else
+                    openFilterList();
+
+
             }
         });
     }
@@ -125,6 +133,24 @@ public class MainActivity extends AppCompatActivity {
            }
            Toast.makeText(this, "we made new filtered image!!", Toast.LENGTH_SHORT).show();
            imageView.setImageURI(selectedImage);
+       }
+       if(requestCode == REQUEST_FILTER_PICK && resultCode == RESULT_OK)
+       {
+           String pickedFilter = data.getExtras().getString("Filter Name");
+           if(pickedFilter.equals("BlackWhite")) {
+               Toast.makeText(this, "blackwhite", Toast.LENGTH_SHORT).show();
+               filteredImage.toBlackWhite();
+               Bitmap bitmap = filteredImage.getFinalImage();
+               imageView.setImageBitmap(bitmap);
+           }
+           if(pickedFilter.equals("Negative"))
+           {
+               Toast.makeText(this, "negative", Toast.LENGTH_SHORT).show();
+               filteredImage.toNegative();
+               Bitmap bitmap = filteredImage.getFinalImage();
+               imageView.setImageBitmap(bitmap);
+           }
+
        }
     }
     // rotating image for displaying it correctly
@@ -205,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent,REQUEST_IMAGE_PICK);
     }
+    //will be deleted later
     public void applyFilter(FilteredImage filteredImage)
     {
         Toast.makeText(this, "pre filtr ", Toast.LENGTH_SHORT).show();
@@ -213,5 +240,10 @@ public class MainActivity extends AppCompatActivity {
         Bitmap bitmap = filteredImage.getFinalImage();
         Toast.makeText(this, "get final image", Toast.LENGTH_SHORT).show();
         imageView.setImageBitmap(bitmap);
+    }
+    public void openFilterList()
+    {
+        Intent intent = new Intent(this,listOfFilters.class);
+        startActivityForResult(intent,REQUEST_FILTER_PICK);
     }
 }
