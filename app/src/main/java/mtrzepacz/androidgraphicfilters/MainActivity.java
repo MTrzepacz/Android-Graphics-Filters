@@ -151,8 +151,29 @@ public class MainActivity extends AppCompatActivity {
            }
            if(pickedFilter.equals("GaussianBlur"))
            {
-               Toast.makeText(this, "gaussian blur", Toast.LENGTH_SHORT).show();
+               Toast.makeText(this, "Gaussian blur", Toast.LENGTH_SHORT).show();
                filteredImage.toGaussianBlur();
+               Bitmap bitmap = filteredImage.getFinalImage();
+               imageView.setImageBitmap(bitmap);
+           }
+           if(pickedFilter.equals("Sepia"))
+           {
+               Toast.makeText(this, "Sepia", Toast.LENGTH_SHORT).show();
+               filteredImage.toSepia();
+               Bitmap bitmap = filteredImage.getFinalImage();
+               imageView.setImageBitmap(bitmap);
+           }
+           if(pickedFilter.equals("Sharpen"))
+           {
+               Toast.makeText(this, "Sharpen", Toast.LENGTH_SHORT).show();
+               filteredImage.toSharpen();
+               Bitmap bitmap = filteredImage.getFinalImage();
+               imageView.setImageBitmap(bitmap);
+           }
+           if(pickedFilter.equals("EdgeDetection"))
+           {
+               Toast.makeText(this, "EdgeDetection", Toast.LENGTH_SHORT).show();
+               filteredImage.toEdgeDetection();
                Bitmap bitmap = filteredImage.getFinalImage();
                imageView.setImageBitmap(bitmap);
            }
