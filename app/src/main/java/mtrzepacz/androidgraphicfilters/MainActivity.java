@@ -20,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -67,7 +69,19 @@ public class MainActivity extends AppCompatActivity {
                 if(filteredImage == null)
                     Toast.makeText(MainActivity.this, "Pick Image First", Toast.LENGTH_SHORT).show();
                 else
+                {
                     openFilterList();
+                }
+            }
+        });
+        buttonSave = (Button) findViewById(R.id.buttonSave);
+        buttonSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(filteredImage==null)
+                    Toast.makeText(MainActivity.this, "There is nothing to save", Toast.LENGTH_SHORT).show();
+                else
+                    safeImage(filteredImage);
             }
         });
     }
@@ -274,4 +288,33 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent,REQUEST_FILTER_PICK);
     }
 
+    public void safeImage(FilteredImage imageToSave)
+    {
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES),"APP FILES");
+        if(!mediaStorageDir.exists())
+        {
+            if(!mediaStorageDir.mkdirs())
+            {
+                Toast.makeText(this, "filed to create directory for files", Toast.LENGTH_SHORT).show();
+            }
+        }
+        String timeStamp = new SimpleDateFormat("yyyy-MM-DD-HH-MM-SS").format(new Date());
+        File mediaFile;
+        mediaFile = new File(mediaStorageDir.getPath(), timeStamp + ".jpg");
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(mediaFile);
+            Bitmap bitmap = imageToSave.getFinalImage();
+            bitmap.compress(Bitmap.CompressFormat.JPEG,100,fileOutputStream);
+            fileOutputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        scanIntent.setData(Uri.fromFile(mediaFile));
+        this.sendBroadcast(scanIntent);
+
+    }
 }
